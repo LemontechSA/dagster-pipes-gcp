@@ -32,6 +32,7 @@ runs:
         echo $APP_ZIP_NAME
         echo "GCP_APP_NAME=$GCP_APP_NAME" >> $GITHUB_ENV
         echo "APP_ZIP_NAME=$APP_ZIP_NAME" >> $GITHUB_ENV
+      shell: bash
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
