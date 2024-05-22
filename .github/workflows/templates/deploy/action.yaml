@@ -56,6 +56,6 @@ runs:
       run: |
         gcloud functions deploy ${{ inputs.app_name }} \
           --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }} \
-          --region europe-west4
+          --region europe-west4 \
           --gen2
       shell: bash
