@@ -51,9 +51,9 @@ jobs:
           else
             ENV=acc
           fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ENVIRONMENT=$ENV" >> $GITHUB_ENV
-          echo "VERSION=$VERSION+$ENV" >> $GITHUB_ENV
-          echo "VERSION=$VERSION+$ENV" >> $GITHUB_OUTPUT
           echo "ENVIRONMENT=$ENV" >> $GITHUB_OUTPUT
       - name: build
         uses: ./.github/workflows/templates/build
