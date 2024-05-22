@@ -49,9 +49,13 @@ runs:
         path: .
     - name: upload source code
       run: |
-        gsutil cp ${{ env.APP_ZIP_NAME }} gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }}
+        gsutil cp ${{ env.APP_ZIP_NAME }} \
+          gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }}
       shell: bash
     - name: Deploy
       run: |
-        gcloud functions deploy ${{ inputs.app_name }} --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }} --region europe-west4
+        gcloud functions deploy ${{ inputs.app_name }} \
+          --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }} \
+          --region europe-west4
+          --gen2
       shell: bash
