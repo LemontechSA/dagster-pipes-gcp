@@ -37,6 +37,9 @@ runs:
       with: # NB: downloaded to main directory
         name: gcloud-functions-app
         path: .
+    - name: fff
+      run: ls -la
+      shell: bash
     - name: upload source code
       run: |
         gsutil cp ${{ inputs.app_name }}-${{ inputs.version }}.zip gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ inputs.app_name }}-${{ inputs.version }}.zip
