@@ -1,9 +1,9 @@
 import google.cloud.logging
 
+from .version import __version__
+
 client = google.cloud.logging.Client()
 logger = client.logger("dagster-pipes-gcp")
-
-__version__ = "0.0.0"
 
 
 def main(request):
