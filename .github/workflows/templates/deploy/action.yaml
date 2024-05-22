@@ -23,6 +23,15 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: 'set app name'
+      id: app_name
+      run: |
+        GCP_APP_NAME=${{ inputs.app_name }}-${{ inputs.version }} | tr + -
+        APP_ZIP_NAME=${{ inputs.app_name }}-${{ inputs.version }}.zip
+        echo $GCP_APP_NAME
+        echo $APP_ZIP_NAME
+        echo "GCP_APP_NAME=$GCP_APP_NAME" >> $GITHUB_ENV
+        echo "APP_ZIP_NAME=$APP_ZIP_NAME" >> $GITHUB_ENV
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
@@ -37,14 +46,11 @@ runs:
       with: # NB: downloaded to main directory
         name: gcloud-functions-app
         path: .
-    - name: fff
-      run: ls -la
-      shell: bash
     - name: upload source code
       run: |
-        gsutil cp ${{ inputs.app_name }}-${{ inputs.version }}.zip gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ inputs.app_name }}-${{ inputs.version }}.zip
+        gsutil cp ${{ env.APP_ZIP_NAME }} gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }}
       shell: bash
     - name: Deploy
       run: |
-        gcloud functions deploy ${{ inputs.app_name }}-${{ inputs.version }} --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ inputs.app_name }}-${{ inputs.version }}.zip --region europe-west4
+        gcloud functions deploy ${{ env.GCP_APP_NAME }} --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }} --region europe-west4
       shell: bash

@@ -15,6 +15,15 @@ runs:
     - id: checkout
       name: Checkout
       uses: actions/checkout@v3
+    - name: 'set app name'
+      id: app_name
+      run: |
+        GCP_APP_NAME=${{ inputs.app_name }}-${{ inputs.version }} | tr + -
+        APP_ZIP_NAME=${{ inputs.app_name }}-${{ inputs.version }}.zip
+        echo $GCP_APP_NAME
+        echo $APP_ZIP_NAME
+        echo "GCP_APP_NAME=$GCP_APP_NAME" >> $GITHUB_ENV
+        echo "APP_ZIP_NAME=$APP_ZIP_NAME" >> $GITHUB_ENV
     - name: install poetry
       uses: snok/install-poetry@v1
     - name: export dependencies
@@ -28,10 +37,10 @@ runs:
     - name: zip source code
       working-directory: ./src
       run: |
-        zip ../${{ inputs.app_name }}-${{ inputs.version }}.zip *
+        zip ../${{ env.APP_ZIP_NAME }} *
       shell: bash
     - name: upload zipped code
       uses: actions/upload-artifact@v4
       with:
         name: gcloud-functions-app
-        path: ${{ inputs.app_name }}-${{ inputs.version }}.zip
+        path: ${{ env.APP_ZIP_NAME }}
