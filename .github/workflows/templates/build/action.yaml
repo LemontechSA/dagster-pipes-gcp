@@ -24,6 +24,7 @@ runs:
         echo $APP_ZIP_NAME
         echo "GCP_APP_NAME=$GCP_APP_NAME" >> $GITHUB_ENV
         echo "APP_ZIP_NAME=$APP_ZIP_NAME" >> $GITHUB_ENV
+      shell: bash
     - name: install poetry
       uses: snok/install-poetry@v1
     - name: export dependencies
