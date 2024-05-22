@@ -7,6 +7,15 @@ logger = client.logger("dagster-pipes-gcp")
 
 
 def main(request):
-    logger.log_struct({"severity": "INFO", "message": __version__})
-    logger.log_struct({"severity": "INFO", "message": "Hello world!"})
+    global_log_fields = {}
+
+    trace_header = request.headers.get("X-Cloud-Trace-Context")
+
+    trace = trace_header.split("/")
+    global_log_fields["logging.googleapis.com/trace"] = (
+        f"projects/jasper-ginn-dagster/traces/{trace[0]}"
+    )
+
+    logger.log_struct({"severity": "INFO", "message": __version__, **global_log_fields})
+    logger.log_struct({"severity": "INFO", "message": "Hello world!", **global_log_fields})
     return "boo"
