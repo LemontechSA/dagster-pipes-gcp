@@ -57,5 +57,8 @@ runs:
         gcloud functions deploy ${{ inputs.app_name }} \
           --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }} \
           --region europe-west4 \
+          --no-allow-unauthenticated \
+          --entry-point=main \
+          --runtime=python311 \
           --gen2
       shell: bash
