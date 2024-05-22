@@ -60,5 +60,6 @@ runs:
           --no-allow-unauthenticated \
           --entry-point=main \
           --runtime=python311 \
+          --trigger-http \
           --gen2
       shell: bash
