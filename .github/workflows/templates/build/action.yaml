@@ -18,11 +18,8 @@ runs:
     - name: 'set app name'
       id: app_name
       run: |
-        GCP_APP_NAME=${{ inputs.app_name }}-${{ inputs.version }} | tr + -
         APP_ZIP_NAME=${{ inputs.app_name }}-${{ inputs.version }}.zip
-        echo $GCP_APP_NAME
         echo $APP_ZIP_NAME
-        echo "GCP_APP_NAME=$GCP_APP_NAME" >> $GITHUB_ENV
         echo "APP_ZIP_NAME=$APP_ZIP_NAME" >> $GITHUB_ENV
       shell: bash
     - name: install poetry
