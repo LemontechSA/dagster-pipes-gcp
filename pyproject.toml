@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "dagster-gcp-function"
+version = "0.1.0"
+description = "Cloud function that uses dagster-pipes as an execution environment"
+authors = ["Jasper Ginn <jasperginn@google.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+functions-framework = "^3.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.5.0"
+ipykernel = "^6.29.4"
+python-dotenv = "^1.0.1"
+
+[tool.black]
+line-length = 100
+exclude = '''
+^/(
+  (
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.venv
+    | _build
+    | build
+    | dist
+    | .notebooks
+    | .nox
+  )
+)
+'''
+
+[tool.ruff]
+ignore = ["E501"]
+extend-exclude = ["__pycache__", ".tmp"]
+
+[tool.isort]
+profile = "black"
+known_third_party = "dbutils_typehint,mlflow,numpy,opencensus,pandas,pyspark,pytest,setuptools,sklearn"
+line_length = 100
+
+[tool.mypy]
+exclude = ["^.notebooks/", "^tasks\\.py$"]
+ignore_missing_imports = true
+
+[tool.poetry-git-version-plugin]
+alpha_version_format = '{version}a{distance}+{commit_hash}'
+version_format = '{version}'
+ignore_pep440 = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,83 @@
+name: 'Pipeline'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: 'checks'
+    if: ${{ github.event_name == 'pull_request'}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: 'checks'
+        uses: ./.github/workflows/templates/checks
+        with:
+          python_version: "3.11"
+          pre_commit_version: "3.1.1"
+  build:
+    name: 'build'
+    if: always() && (needs.checks.result == 'success' || needs.checks.result == 'skipped')
+    needs: checks
+    runs-on: ubuntu-latest
+    concurrency:
+      # This prevents concurrency in building/deploying an environment.
+      group: ${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: set up poetry
+        uses: snok/install-poetry@v1
+      - name: install git-version plugin
+        run: |
+          poetry self add poetry-git-version-plugin
+      - name: 'determine version'
+        id: version
+        run: |
+          VERSION=$(poetry git-version --no-ansi)
+          if [ $GITHUB_REF != refs/heads/main ]
+          then
+            ENV=test
+          else
+            ENV=acc
+          fi
+          echo "ENVIRONMENT=$ENV" >> $GITHUB_ENV
+          echo "VERSION=$VERSION+$ENV" >> $GITHUB_ENV
+          echo "VERSION=$VERSION+$ENV" >> $GITHUB_OUTPUT
+          echo "ENVIRONMENT=$ENV" >> $GITHUB_OUTPUT
+      - name: build
+        uses: ./.github/workflows/templates/build
+        with:
+          app_name: dagster-pipes-gcp
+          version: ${{ env.VERSION }}
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+      ENVIRONMENT: ${{ steps.version.outputs.ENVIRONMENT }}
+  deploy:
+    name: 'deploy'
+    if: always() && (needs.build.result == 'success')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: deploy
+        env:
+          VERSION: ${{ needs.build.outputs.VERSION }}
+          ENVIRONMENT: ${{ needs.build.outputs.ENVIRONMENT }}
+        uses: ./.github/workflows/templates/deploy
+        with:
+          app_name: looker-export
+          version: ${{ env.VERSION }}
+          environment: ${{ env.ENVIRONMENT }}
+          gcp_project_id: "jasperg-dagster"

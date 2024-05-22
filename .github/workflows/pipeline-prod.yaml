@@ -1,0 +1,43 @@
+name: 'Pipeline'
+
+on:
+  release:
+    types: [ "published" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: 'build'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: 'set version'
+        id: version
+        run: |
+          VERSION=$(echo $GITHUB_REF | sed -e 's/refs\/tags\///g')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      - name: build
+        uses: ./.github/workflows/templates/build
+        with:
+          app_name: looker-export
+          version: ${{ env.VERSION }}
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+  deploy:
+    name: 'deploy'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: deploy
+        uses: ./.github/workflows/templates/deploy
+        with:
+          app_name: looker-export
+          version: ${{ needs.build.outputs.VERSION }}
+          environment: ${{ needs.build.outputs.ENVIRONMENT }}
+          gcp_project_id: "jasperg-dagster"

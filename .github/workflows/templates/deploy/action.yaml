@@ -1,0 +1,43 @@
+name: build
+description: "Package google cloud function application."
+
+inputs:
+    app_name:
+        description: "Name of the cloud function application."
+        required: true
+    version:
+        description: "Version of this cloud function application."
+        required: true
+    environment:
+        description: "Environment this application is build for (test/cprod/prod)."
+        required: true
+    gcp_project_id:
+        description: "The GCP project id in which the function is deployed."
+        required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+    - name: 'Set project'
+      run: gcloud config set project ${{ inputs.gcp_project_id }}
+    - name: download gcloud functions app
+      uses: actions/download-artifact@v4
+      with: # NB: downloaded to main directory
+        name: gcloud-functions-app
+        path: .
+    - name: upload source code
+      run: |
+        gsutil cp ${{ inputs.app_name }}-${{ inputs.version }}.zip gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ inputs.app_name }}-${{ inputs.version }}.zip
+      shell: bash
+    - name: Deploy
+      run: |
+        gcloud functions deploy ${{ inputs.app_name }}-${{ inputs.version }} --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ inputs.app_name }}-${{ inputs.version }}.zip --region europe-west4
+      shell: bash
