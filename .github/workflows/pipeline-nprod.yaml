@@ -77,7 +77,7 @@ jobs:
           ENVIRONMENT: ${{ needs.build.outputs.ENVIRONMENT }}
         uses: ./.github/workflows/templates/deploy
         with:
-          app_name: looker-export
+          app_name: dagster-pipes-gcp
           version: ${{ env.VERSION }}
           environment: ${{ env.ENVIRONMENT }}
           gcp_credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
