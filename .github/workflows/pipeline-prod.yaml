@@ -39,5 +39,6 @@ jobs:
         with:
           app_name: looker-export
           version: ${{ needs.build.outputs.VERSION }}
-          environment: ${{ needs.build.outputs.ENVIRONMENT }}
+          environment: prod
+          gcp_secrets: ${{ secrets.GOOGLE_CREDENTIALS }}
           gcp_project_id: "jasper-ginn-dagster"

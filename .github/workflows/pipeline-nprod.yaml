@@ -80,4 +80,5 @@ jobs:
           app_name: looker-export
           version: ${{ env.VERSION }}
           environment: ${{ env.ENVIRONMENT }}
+          gcp_credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
           gcp_project_id: "jasper-ginn-dagster"

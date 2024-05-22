@@ -11,6 +11,9 @@ inputs:
     environment:
         description: "Environment this application is build for (test/cprod/prod)."
         required: true
+    gcp_credentials:
+      description: "GCP Service Account JSON credentials with permissions to access and deploy to GKE."
+      required: true
     gcp_project_id:
         description: "The GCP project id in which the function is deployed."
         required: true
@@ -23,7 +26,7 @@ runs:
     - id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+        credentials_json: '${{ inputs.gcp_credentials }}'
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
     - name: 'Set project'
