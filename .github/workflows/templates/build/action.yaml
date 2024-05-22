@@ -30,7 +30,7 @@ runs:
       shell: bash
     - name: 'set python package version'
       run: |
-        sed -i -e "s/0.0.0/${{ inputs.version }}/g" src/main.py
+        sed -i -e "s/0.0.0/${{ inputs.version }}/g" src/version.py
       shell: bash
     - name: zip source code
       working-directory: ./src
