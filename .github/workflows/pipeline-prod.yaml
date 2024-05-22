@@ -23,7 +23,7 @@ jobs:
       - name: build
         uses: ./.github/workflows/templates/build
         with:
-          app_name: dagster-pipes-gcp-prod
+          app_name: dagster-pipes-gcp
           version: ${{ env.VERSION }}
     outputs:
       VERSION: ${{ steps.version.outputs.VERSION }}
@@ -37,7 +37,7 @@ jobs:
       - name: deploy
         uses: ./.github/workflows/templates/deploy
         with:
-          app_name: dagster-pipes-gcp-prod
+          app_name: dagster-pipes-gcp
           version: ${{ needs.build.outputs.VERSION }}
           environment: prod
           gcp_secrets: ${{ secrets.GOOGLE_CREDENTIALS }}

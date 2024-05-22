@@ -54,7 +54,7 @@ runs:
       shell: bash
     - name: Deploy
       run: |
-        gcloud functions deploy ${{ inputs.app_name }} \
+        gcloud functions deploy ${{ inputs.app_name }}-${{ inputs.environment }} \
           --source=gs://${{ inputs.gcp_project_id }}-cloud-functions-source-code/${{ inputs.environment }}/source/${{ inputs.app_name }}/${{ env.APP_ZIP_NAME }} \
           --region europe-west4 \
           --no-allow-unauthenticated \
