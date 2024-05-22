@@ -26,7 +26,13 @@ runs:
       uses: snok/install-poetry@v1
     - name: export dependencies
       run: |
-        poetry export --format requirements.txt --without-hashes -o src/requirements.txt
+        # Forward-compatibility
+        poetry self add poetry-plugin-export
+        poetry export \
+          --format requirements.txt \
+          --without-hashes \
+          --without=dev \
+          -o src/requirements.txt
       shell: bash
     - name: 'set python package version'
       run: |
