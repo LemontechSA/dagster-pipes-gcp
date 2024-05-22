@@ -80,4 +80,4 @@ jobs:
           app_name: looker-export
           version: ${{ env.VERSION }}
           environment: ${{ env.ENVIRONMENT }}
-          gcp_project_id: "jasperg-dagster"
+          gcp_project_id: "jasper-ginn-dagster"
