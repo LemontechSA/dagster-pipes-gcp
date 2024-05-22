@@ -23,7 +23,7 @@ runs:
       shell: bash
     - name: 'set python package version'
       run: |
-        sed -i -e "s/0.0.0/${{ inputs.version }}/g" src/__init__.py
+        sed -i -e "s/__version__=0.0.0/__version__=${{ inputs.version }}/g" src/main.py
       shell: bash
     - name: zip source code
       working-directory: ./src
