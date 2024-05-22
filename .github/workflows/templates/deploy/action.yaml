@@ -28,6 +28,7 @@ runs:
       uses: 'google-github-actions/setup-gcloud@v2'
     - name: 'Set project'
       run: gcloud config set project ${{ inputs.gcp_project_id }}
+      shell: bash
     - name: download gcloud functions app
       uses: actions/download-artifact@v4
       with: # NB: downloaded to main directory
