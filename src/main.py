@@ -1,13 +1,12 @@
 import logging
 
 import google.cloud.logging
-from google.cloud.logging_v2.handlers import CloudLoggingHandler
 
 client = google.cloud.logging.Client()
-handler = CloudLoggingHandler(client)
 
-logger = logging.getLogger("dagster-pipes-gcp")
-logger.setLevel(logging.DEBUG)
+handler = client.get_default_handler()
+logger = logging.getLogger("cloudLogger")
+logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 __version__ = "0.0.0"
