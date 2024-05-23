@@ -17,7 +17,7 @@ jobs:
       - name: 'set version'
         id: version
         run: |
-          VERSION=$(echo $GITHUB_REF | sed -e 's/refs\/tags\///g')
+          VERSION=$(echo $GITHUB_REF | sed -e 's/refs\/tags\/v//g')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
       - name: build
