@@ -1,3 +1,5 @@
+import time
+
 import google.cloud.logging
 
 from .version import __version__
@@ -15,4 +17,5 @@ def main(request):
     )
     logger.log_struct({"severity": "INFO", "message": __version__, **global_log_fields})
     logger.log_struct({"severity": "INFO", "message": "Hello world!", **global_log_fields})
+    time.sleep(60)
     return "boo"
