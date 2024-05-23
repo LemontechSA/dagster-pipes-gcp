@@ -10,7 +10,6 @@ permissions:
 jobs:
   build:
     name: 'build'
-    needs: checks
     runs-on: ubuntu-latest
     concurrency:
       # This prevents concurrency in building/deploying an environment.
