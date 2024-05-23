@@ -40,5 +40,5 @@ jobs:
           app_name: dagster-pipes-gcp
           version: ${{ needs.build.outputs.VERSION }}
           environment: prod
-          gcp_secrets: ${{ secrets.GOOGLE_CREDENTIALS }}
+          gcp_credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
           gcp_project_id: "jasper-ginn-dagster"
