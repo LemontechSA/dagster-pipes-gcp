@@ -8,9 +8,21 @@ permissions:
   contents: read
 
 jobs:
+  checks:
+    name: 'checks'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: 'checks'
+        uses: ./.github/workflows/templates/checks
+        with:
+          python_version: "3.11"
+          pre_commit_version: "3.1.1"
   build:
     name: 'build'
     runs-on: ubuntu-latest
+    needs: checks
     concurrency:
       # This prevents concurrency in building/deploying an environment.
       group: nprod
