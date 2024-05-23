@@ -148,3 +148,4 @@ cython_debug/
 # Development work
 .develop
 .tmp
+.secrets

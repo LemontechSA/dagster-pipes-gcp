@@ -32,6 +32,18 @@ RUN echo 'eval "$(pyenv init -)"' >> /home/vscode/.bashrc \
     && pyenv rehash \
     && pip install --no-cache-dir --upgrade pip
 
+# Gcloud
+RUN apt-get update -y \
+    && apt-get install -y apt-transport-https \
+        ca-certificates \
+        gnupg \
+        curl \
+    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
+    && apt-get update -y \
+    && apt-get install google-cloud-sdk -y \
+    && rm -rf /var/lib/apt/lists/*
+
 # Poetry
 RUN pipx install poetry==1.8.3
 
