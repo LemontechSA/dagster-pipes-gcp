@@ -13,7 +13,8 @@ serve:
 call:
   curl -m 70 -X POST http://127.0.0.1:8080 \
     -H "Content-Type: application/json" \
-    -d '{"name": "Hello World"}'
+    -H "X-Cloud-Trace-Context: 00aa1122334455/043" \
+    -d '{"some_parameter_value": 1}'
 
 dev:
   poetry run dagster dev -f dagster/DAG.py
