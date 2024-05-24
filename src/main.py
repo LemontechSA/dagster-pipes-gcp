@@ -13,6 +13,7 @@ def main(request):
     global_log_fields["logging.googleapis.com/trace"] = (
         f"projects/jasper-ginn-dagster/traces/{trace[0]}"
     )
+    logger.log_struct({"severity": "INFO", "message": request["name"], **global_log_fields})
     logger.log_struct({"severity": "INFO", "message": __version__, **global_log_fields})
     logger.log_struct({"severity": "INFO", "message": "Hello world!", **global_log_fields})
     return "boo"
