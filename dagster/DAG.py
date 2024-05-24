@@ -11,6 +11,7 @@ CLOUD_FUNCTIONS_URL = (
     "https://europe-west4-jasper-ginn-dagster.cloudfunctions.net/dagster-pipes-gcp-acc"
 )
 SERVICE_ACCOUNT_FILE = "/Users/jasperginn/Downloads/jasper-ginn-dagster-897f24248ee6.json"
+LOGGER_NAME = "dagster-pipes-gcp"
 
 
 # @asset
