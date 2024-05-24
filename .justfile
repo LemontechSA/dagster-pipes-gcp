@@ -16,13 +16,6 @@ call:
     -H "X-Cloud-Trace-Context: 00aa1122334455/043" \
     -d '{"some_parameter_value": 1}'
 
-curl -m 70 -X POST https://europe-west4-jasper-ginn-dagster.cloudfunctions.net/dagster-pipes-gcp-nprod \
--H "Authorization: bearer $(gcloud auth print-identity-token)" \
--H "Content-Type: application/json" \
--d '{
-  "some_parameter_value": 1
-}'
-
 dev:
   cd dagster && poetry run dagster dev -f DAG.py
 

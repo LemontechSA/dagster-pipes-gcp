@@ -1,16 +1,15 @@
 import logging
-import typing
 import uuid
 
 import flask
 import google.cloud.logging
 from dagster_pipes import PipesMappingParamsLoader, open_dagster_pipes
-from google.cloud.logging.handlers import CloudLoggingHandler
+from google.cloud.logging.handlers import StructuredLogHandler
 from google.cloud.logging_v2.handlers import setup_logging
 
 from version import __version__
 
-EXECUTION_ID: typing.Optional[str] = str(uuid.uuid4())
+EXECUTION_ID = str(uuid.uuid4())
 
 
 class ContextFilter(logging.Filter):
@@ -20,7 +19,7 @@ class ContextFilter(logging.Filter):
 
 
 client = google.cloud.logging.Client()
-handler = CloudLoggingHandler(client)
+handler = StructuredLogHandler(client)
 handler.addFilter(ContextFilter())
 setup_logging(handler)
 
