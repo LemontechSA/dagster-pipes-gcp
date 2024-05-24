@@ -6,7 +6,7 @@ import google.cloud.logging
 from dagster_pipes import PipesMappingParamsLoader, open_dagster_pipes
 from google.cloud.logging_v2.handlers import setup_logging
 
-from utils import PipesLoggerMessageWriter
+from pipes_utils import PipesLoggerMessageWriter
 from version import __version__
 
 EXECUTION_ID = str(uuid.uuid4())
