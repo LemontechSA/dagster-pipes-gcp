@@ -1,40 +1,23 @@
-import logging
-import uuid
-
 import flask
 import google.cloud.logging
 from dagster_pipes import PipesMappingParamsLoader, open_dagster_pipes
-from google.cloud.logging_v2.handlers import setup_logging
 
 from pipes_utils import PipesLoggerMessageWriter
 from version import __version__
 
-EXECUTION_ID = str(uuid.uuid4())
-
-
-class ContextFilter(logging.Filter):
-    def filter(self, record):
-        record.json_fields = {"execution_id": EXECUTION_ID}
-        return True
-
-
 client = google.cloud.logging.Client()
-handler = client.get_default_handler()
-handler.addFilter(ContextFilter())
-setup_logging(handler)
-
-# Also stream messages to the console (for local development)
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-root_logger = logging.getLogger()
-root_logger.addHandler(stream_handler)
+client.setup_logging()
 
 
 def main(request: flask.Request):
     event = request.get_json()
+    trace_header = request.headers.get("X-Cloud-Trace-Context")
+    trace = trace_header.split("/")[0]
     with open_dagster_pipes(
         params_loader=PipesMappingParamsLoader(event),
-        message_writer=PipesLoggerMessageWriter(),
+        message_writer=PipesLoggerMessageWriter(
+            trace=f"projects/jasper-ginn-dagster/traces/{trace}"
+        ),
     ) as pipes:
         pipes.log.info(f"Version: {__version__}")
         event_value = event["some_parameter_value"]
