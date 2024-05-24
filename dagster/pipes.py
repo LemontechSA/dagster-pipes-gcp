@@ -1,9 +1,8 @@
-import base64
 from contextlib import contextmanager
 from typing import Any, Iterator, Mapping
 
 from dagster_pipes import PipesDefaultMessageWriter
-from utils import invoke_cloud_function
+from utils import get_execution_logs, invoke_cloud_function
 
 import dagster._check as check
 from dagster import PipesClient  # type: ignore
@@ -43,14 +42,18 @@ class PipesFunctionLogsMessageReader(PipesMessageReader):
         finally:
             self._handler = None
 
-    def consume_lambda_logs(self, response) -> None:
+    def consume_cloud_function_logs(self, response) -> None:
         handler = check.not_none(
             self._handler, "Can only consume logs within context manager scope."
         )
 
-        log_result = base64.b64decode(response["LogResult"]).decode("utf-8")
+        # Get GCP trace id
+        trace_id = response.headers.get("X-Cloud-Trace-Context").split(";")[0]
 
-        for log_line in log_result.splitlines():
+        # Get logs
+        log_result = get_execution_logs(trace_id)
+
+        for log_line in log_result:
             extract_message_or_forward_to_stdout(handler, log_line)
 
     def no_messages_debug_text(self) -> str:
@@ -109,10 +112,13 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
             else:
                 payload_data: Mapping[str, Any] = event  # type: ignore
 
-            _ = invoke_cloud_function(
+            context.log.info(payload_data)
+            response = invoke_cloud_function(
                 url=function_url,
                 data=payload_data,
             )
+
+            self._message_reader.consume_cloud_function_logs(response)
 
         # should probably have a way to return the lambda result payload
         return PipesClientCompletedInvocation(session)

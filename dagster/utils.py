@@ -57,9 +57,11 @@ def get_execution_logs(trace_id: str):
 
     out = []
     for entry in logging_client.list_entries(
-        filter_=f'resource.type="cloud_function" AND jsonPayload."logging.googleapis.com/trace"="projects/jasper-ginn-dagster/traces/{trace_id}"'
+        filter_=f'jsonPayload.trace="projects/jasper-ginn-dagster/traces/{trace_id}" AND logName="projects/jasper-ginn-dagster/logs/dagster-pipes-utils"'
     ):
-        out.append(entry.payload)
+        if entry.payload is not None:
+            if entry.payload.get("message") is not None:
+                out.append(entry.payload["message"])
     if len(out) == 0:
         raise NoLogsException(f"No logs found for trace id={trace_id}")
     return out
