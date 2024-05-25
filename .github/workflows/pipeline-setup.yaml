@@ -1,0 +1,30 @@
+name: 'Setup'
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    name: 'Setup'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+    - name: 'Set project'
+      run: gcloud config set project jasper-ginn-dagster
+    - name: 'Enable services'
+      run: ./.github/workflows/scripts/enable_services.sh
+      shell: bash
+    - name: 'Create storage bucket'
+      run: ./.github/workflows/scripts/create_bucket.sh jasper-ginn-dagster
+      shell: bash
