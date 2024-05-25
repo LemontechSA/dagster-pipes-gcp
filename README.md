@@ -20,7 +20,10 @@ Open the project in the devcontainer and run `just setup`/`just s`. This will in
 
 In GitHub secrets, ensure that you have set the `GOOGLE_CREDENTIALS` secret with the JSON service account credentials of a service account that is allowed to deploy cloud functions.
 
-Also, you should change the 'gcp_project_id' input to your own project id in the 'deploy' templates used by '.github/workflows/pipeline-nprod.yaml' and .'github/workflows/pipeline-prod.yaml'.
+Also, you should change the 'GCP_PROJECT_ID' environment variable in the following pipelines:
+- '.github/workflows/pipeline-nprod.yaml'
+- '.github/workflows/pipeline-prod.yaml'
+- '.github/workflows/pipeline-setup.yaml'
 
 Go to GitHub and manually trigger the pipeline called 'setup'. This will enable the APIs and create a storage bucket to store the cloud functions code.
 
