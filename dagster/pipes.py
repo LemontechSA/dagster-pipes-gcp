@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from typing import Any, Iterator, Mapping
 
 from dagster_pipes import PipesDefaultMessageWriter
+from httpx import HTTPStatusError
 from utils import get_execution_logs, invoke_cloud_function
 
 import dagster._check as check
@@ -124,7 +125,15 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
                 data=payload_data,
             )
 
-            self._message_reader.consume_cloud_function_logs(response)
+            context.log.debug(response.status_code)
+
+            if response.status_code != 200:
+                context.log.debug(response.content.decode("utf-8"))
+                raise HTTPStatusError(
+                    f"Failed to invoke cloud function {function_url} with status code {response.status_code}"
+                )
+
+            # self._message_reader.consume_cloud_function_logs(response)
 
         # should probably have a way to return the lambda result payload
         return PipesClientCompletedInvocation(session)

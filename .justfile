@@ -3,7 +3,7 @@ set dotenv-path := "/home/vscode/workspace/.devcontainer/.env"
 alias s := setup
 alias p := pre_commit
 alias dd := dagster_dev
-alias s := serve_cloud_function
+alias sf := serve_cloud_function
 
 set_project:
   @echo "Setting gcloud project to $GOOGLE_PROJECT_ID"

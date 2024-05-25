@@ -17,3 +17,15 @@ In .devcontainer/.env, change the GOOGLE_PROJECT_ID environment variable to your
 Open the project in the devcontainer and run `just setup`/`just s`. This will install the dependencies and configure gcloud.
 
 ## Development
+
+In one terminal, serve the cloud function locally using the `functions-framework` library.
+
+```
+just s
+```
+
+In another terminal, start the dagster locally:
+
+```
+just dd
+```
