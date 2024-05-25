@@ -5,7 +5,6 @@ alias p := pre_commit
 alias dd := dagster_dev
 alias s := serve_cloud_function
 
-
 set_project:
   @echo "Setting gcloud project to $GOOGLE_PROJECT_ID"
   gcloud config set project $GOOGLE_PROJECT_ID
