@@ -11,7 +11,6 @@ from dagster_pipes import (  # _assert_opt_env_param_type
     PipesMessageWriter,
     PipesMessageWriterChannel,
     PipesParams,
-    _assert_env_param_type,
 )
 
 logging_client = google.cloud.logging.Client()
@@ -26,21 +25,26 @@ class PipesCloudStorageMessageWriter(PipesBlobStoreMessageWriter):
     """
 
     def __init__(
-        self, client: google.cloud.storage.Client, *, execution_id: str, interval: float = 10
+        self,
+        client: google.cloud.storage.Client,
+        *,
+        execution_id: str,
+        bucket: str,
+        interval: float = 10,
     ):
         super().__init__(interval=interval)
         self._client = client
+        self._bucket = bucket
         self._execution_id = execution_id
 
     def make_channel(
         self,
         params: PipesParams,
     ) -> "PipesCloudStorageMessageWriterChannel":
-        bucket = _assert_env_param_type(params, "bucket", str, self.__class__)
         # key_prefix = _assert_opt_env_param_type(params, "key_prefix", str, self.__class__)
         return PipesCloudStorageMessageWriterChannel(
             client=self._client,
-            bucket=bucket,
+            bucket=self._bucket,
             key_prefix=self._execution_id,
             interval=self.interval,
         )

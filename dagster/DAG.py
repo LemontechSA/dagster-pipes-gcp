@@ -11,10 +11,10 @@ def cloud_function_pipes_asset(
 ) -> MaterializeResult:
     return pipes_function_client.run(
         context=context,
-        # function_url="http://127.0.0.1:8080",
-        function_url="https://europe-west4-jasper-ginn-dagster.cloudfunctions.net/dagster-pipes-gcp-nprod",
-        event={"table_location": "gs://dala-cst-euw4-jgdag-prd/bronze/fake_data"},
-        env={
+        function_url="http://127.0.0.1:8080",
+        # function_url="https://europe-west4-jasper-ginn-dagster.cloudfunctions.net/dagster-pipes-gcp-nprod",
+        event={
+            "table_location": "gs://dala-cst-euw4-jgdag-prd/bronze/fake_data",
             "bucket": "dala-cst-euw4-jgdag-prd",
         },
     ).get_materialize_result()

@@ -1,5 +1,3 @@
-import uuid
-
 import flask
 import google.cloud.logging
 import google.cloud.storage
@@ -14,12 +12,12 @@ client.setup_logging()
 
 def main(request: flask.Request):
     event = request.get_json()
-    trace_header = request.headers.get("X-Cloud-Trace-Context") or str(uuid.uuid4().hex) + "/0"
+    trace_header = request.headers.get("X-Cloud-Trace-Context")
     trace = trace_header.split("/")[0]
     with open_dagster_pipes(
         params_loader=PipesMappingParamsLoader(event),
         message_writer=PipesCloudStorageMessageWriter(
-            client=google.cloud.storage.Client(), execution_id=trace
+            client=google.cloud.storage.Client(), execution_id=trace, bucket=event["bucket"]
         ),
     ) as pipes:
         pipes.log.info(f"Cloud function version: {__version__}")
