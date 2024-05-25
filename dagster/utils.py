@@ -1,4 +1,5 @@
 import json
+import logging
 import typing
 
 import google.cloud.logging
@@ -7,7 +8,10 @@ import google.oauth2.service_account
 import httpx
 import requests
 import tenacity
+from cachetools import TTLCache, cached
 from google.auth.transport.requests import AuthorizedSession, Request
+
+logger = logging.getLogger("dagster.utils")
 
 
 class NotAllLogsReceivedException(Exception): ...
@@ -16,10 +20,16 @@ class NotAllLogsReceivedException(Exception): ...
 class NoLogsException(Exception): ...
 
 
-def _with_id_token(url: str, timeout: int, data: str) -> httpx.Response:
-    """Use credentials set on GOOGLE_APPLICATION_CREDENTIALS environment variable to invoke google cloud function"""
+@cached(cache=TTLCache(ttl=30 * 60, maxsize=100))
+def _get_id_token(url: str) -> str:
     auth_req = Request()
     id_token = google.oauth2.id_token.fetch_id_token(auth_req, url)
+    return id_token
+
+
+def _with_id_token(url: str, timeout: int, data: str) -> httpx.Response:
+    """Use credentials set on GOOGLE_APPLICATION_CREDENTIALS environment variable to invoke google cloud function"""
+    id_token = _get_id_token(url)
     headers = {"Authorization": "bearer " + id_token, "Content-Type": "application/json"}
     resp = httpx.post(url=url, headers=headers, timeout=timeout, data=data)
     return resp
