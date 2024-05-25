@@ -149,3 +149,5 @@ cython_debug/
 .tmp
 .secrets
 .dagster
+
+.DS_Store
