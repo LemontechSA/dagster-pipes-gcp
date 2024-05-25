@@ -3,7 +3,9 @@ from dg_pipes import PipesCloudFunctionClient
 from dagster import AssetExecutionContext, Definitions, MaterializeResult, asset  # type: ignore
 
 
-@asset
+@asset(
+    description="A cloud function that writes fake data to a delta table.",
+)
 def cloud_function_pipes_asset(
     context: AssetExecutionContext, pipes_function_client: PipesCloudFunctionClient
 ) -> MaterializeResult:
