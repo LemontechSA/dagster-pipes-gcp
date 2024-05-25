@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import Any, Iterator, Mapping
+from typing import Any, Iterator, Mapping, Optional
 
 from dagster_pipes import PipesDefaultMessageWriter
 from dg_utils import get_execution_logs, invoke_cloud_function
@@ -86,6 +86,7 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
         *,
         function_url: str,
         event: Mapping[str, Any],
+        env: Optional[Mapping[str, str]] = None,
         context: OpExecutionContext,
     ):
         """Synchronously invoke a cloud function function, enriched with the pipes protocol.
@@ -104,6 +105,7 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
             if isinstance(self._context_injector, PipesCloudFunctionEventContextInjector):
                 payload_data = {
                     **event,
+                    **(env or {}),
                     **session.get_bootstrap_env_vars(),
                 }
             else:

@@ -1,7 +1,8 @@
 import flask
 import google.cloud.logging
+import google.cloud.storage
 from dagster_pipes import PipesContext, PipesMappingParamsLoader, open_dagster_pipes
-from fn_pipes import PipesCloudLoggerMessageWriter
+from fn_pipes import PipesCloudStorageMessageWriter  # , PipesCloudLoggerMessageWriter,
 from fn_utils import get_fake_data
 from version import __version__
 
@@ -15,8 +16,8 @@ def main(request: flask.Request):
     trace = trace_header.split("/")[0]
     with open_dagster_pipes(
         params_loader=PipesMappingParamsLoader(event),
-        message_writer=PipesCloudLoggerMessageWriter(
-            trace=f"projects/jasper-ginn-dagster/traces/{trace}"
+        message_writer=PipesCloudStorageMessageWriter(
+            client=google.cloud.storage.Client(), execution_id=trace
         ),
     ) as pipes:
         pipes.log.info(f"Cloud function version: {__version__}")
