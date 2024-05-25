@@ -21,7 +21,7 @@ Open the project in the devcontainer and run `just setup`/`just s`. This will in
 In one terminal, serve the cloud function locally using the `functions-framework` library.
 
 ```
-just s
+just sf
 ```
 
 In another terminal, start the dagster locally:
