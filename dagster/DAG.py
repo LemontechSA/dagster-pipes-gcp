@@ -12,11 +12,10 @@ def cloud_function_pipes_asset(
 ) -> MaterializeResult:
     return pipes_function_client.run(
         context=context,
-        function_url="http://127.0.0.1:8080",
-        # function_url="https://europe-west4-jasper-ginn-dagster.cloudfunctions.net/dagster-pipes-gcp-nprod",
+        # function_url="http://127.0.0.1:8080",
+        function_url="https://europe-west4-jasper-ginn-dagster.cloudfunctions.net/dagster-pipes-gcp-nprod",
         event={
             "table_location": "gs://dala-cst-euw4-jgdag-prd/bronze/fake_data",
-            "bucket": "dala-cst-euw4-jgdag-prd",
         },
     ).get_materialize_result()
 
@@ -26,7 +25,7 @@ defs = Definitions(
     resources={
         "pipes_function_client": PipesCloudFunctionClient(
             message_reader=PipesCloudStorageMessageReader(
-                bucket="dala-cst-euw4-jgdag-prd",
+                bucket="jasper-ginn-dagster-dagster-pipes-logs",
                 client=google.cloud.storage.Client(),
             )
         )
