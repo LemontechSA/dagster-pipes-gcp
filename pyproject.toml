@@ -11,6 +11,9 @@ python = "^3.11,<3.13"
 functions-framework = "^3.3.0"
 google-cloud-logging = "^3.10.0"
 dagster-pipes = "^1.7.6"
+polars = "^0.20.29"
+faker = "^25.2.0"
+deltalake = "^0.17.4"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.5.0"

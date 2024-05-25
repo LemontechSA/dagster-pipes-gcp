@@ -65,7 +65,7 @@ class PipesCloudFunctionEventContextInjector(PipesEnvContextInjector):
         return "Attempted to inject context via the cloud function event input."
 
 
-class PipesFunctionClient(PipesClient, TreatAsResourceParam):
+class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
     """A pipes client for invoking Google Cloud Function.
 
     By default context is injected via the GCF API call and logs are extracted using google

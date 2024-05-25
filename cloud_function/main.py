@@ -1,7 +1,8 @@
 import flask
 import google.cloud.logging
 from dagster_pipes import PipesContext, PipesMappingParamsLoader, open_dagster_pipes
-from pipes_utils import PipesCloudLoggerMessageWriter
+from fn_pipes import PipesCloudLoggerMessageWriter
+from fn_utils import get_fake_data
 from version import __version__
 
 client = google.cloud.logging.Client()
@@ -19,10 +20,12 @@ def main(request: flask.Request):
         ),
     ) as pipes:
         pipes.log.info(f"Version: {__version__}")
-        event_value = event["some_parameter_value"]
-        pipes.log.info(f"Hello, {event_value}!")
+        table_location = event["table_location"]
+        pipes.log.info(f"Storing data in delta table at {table_location}")
+        df = get_fake_data()
+        df.write_delta(table_location, mode="append")
         pipes.report_asset_materialization(
-            metadata={"some_metric": {"raw_value": event_value + 1, "type": "int"}},
+            metadata={"table_location": table_location},
             data_version="alpha",
         )
     # Force the context to be reinitialized on the next request
