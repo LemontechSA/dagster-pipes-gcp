@@ -1,7 +1,6 @@
 import flask
 import google.cloud.logging
 from dagster_pipes import PipesContext, PipesMappingParamsLoader, open_dagster_pipes
-
 from pipes_utils import PipesLoggerMessageWriter
 from version import __version__
 

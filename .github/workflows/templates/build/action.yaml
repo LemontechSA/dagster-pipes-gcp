@@ -32,14 +32,14 @@ runs:
           --format requirements.txt \
           --without-hashes \
           --only main \
-          -o src/requirements.txt
+          -o cloud_function/requirements.txt
       shell: bash
     - name: 'set python package version'
       run: |
-        sed -i -e "s/0.0.0/${{ inputs.version }}/g" src/version.py
+        sed -i -e "s/0.0.0/${{ inputs.version }}/g" cloud_function/version.py
       shell: bash
     - name: zip source code
-      working-directory: ./src
+      working-directory: ./cloud_function
       run: |
         zip ../${{ env.APP_ZIP_NAME }} *
       shell: bash
