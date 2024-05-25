@@ -1,4 +1,5 @@
-from dg_pipes import PipesCloudFunctionClient
+import google.cloud.storage
+from dg_pipes import PipesCloudFunctionClient, PipesCloudStorageMessageReader
 
 from dagster import AssetExecutionContext, Definitions, MaterializeResult, asset  # type: ignore
 
@@ -22,5 +23,12 @@ def cloud_function_pipes_asset(
 
 defs = Definitions(
     assets=[cloud_function_pipes_asset],
-    resources={"pipes_function_client": PipesCloudFunctionClient()},
+    resources={
+        "pipes_function_client": PipesCloudFunctionClient(
+            message_reader=PipesCloudStorageMessageReader(
+                bucket="dala-cst-euw4-jgdag-prd",
+                client=google.cloud.storage.Client(),
+            )
+        )
+    },
 )

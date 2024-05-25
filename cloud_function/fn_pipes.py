@@ -11,6 +11,8 @@ from dagster_pipes import (  # _assert_opt_env_param_type
     PipesMessageWriter,
     PipesMessageWriterChannel,
     PipesParams,
+    _assert_env_param_type,
+    _assert_opt_env_param_type,
 )
 
 logging_client = google.cloud.logging.Client()
@@ -28,24 +30,21 @@ class PipesCloudStorageMessageWriter(PipesBlobStoreMessageWriter):
         self,
         client: google.cloud.storage.Client,
         *,
-        execution_id: str,
-        bucket: str,
         interval: float = 10,
     ):
         super().__init__(interval=interval)
         self._client = client
-        self._bucket = bucket
-        self._execution_id = execution_id
 
     def make_channel(
         self,
         params: PipesParams,
     ) -> "PipesCloudStorageMessageWriterChannel":
-        # key_prefix = _assert_opt_env_param_type(params, "key_prefix", str, self.__class__)
+        bucket = _assert_env_param_type(params, "bucket", str, self.__class__)
+        key_prefix = _assert_opt_env_param_type(params, "key_prefix", str, self.__class__)
         return PipesCloudStorageMessageWriterChannel(
             client=self._client,
-            bucket=self._bucket,
-            key_prefix=self._execution_id,
+            bucket=bucket,
+            key_prefix=key_prefix,
             interval=self.interval,
         )
 
@@ -77,7 +76,6 @@ class PipesCloudStorageMessageWriterChannel(PipesBlobStoreMessageWriterChannel):
         key = f"{self._key_prefix}/{index}.json" if self._key_prefix else f"{index}.json"
         blob = self._bucket.blob(key)
         body = payload.read()
-        print(body)
         blob.upload_from_string(body)
 
 

@@ -12,15 +12,16 @@ client.setup_logging()
 
 def main(request: flask.Request):
     event = request.get_json()
-    trace_header = request.headers.get("X-Cloud-Trace-Context")
+    trace_header = request.headers.get("X-Cloud-Trace-Context") or "local"
     trace = trace_header.split("/")[0]
     with open_dagster_pipes(
         params_loader=PipesMappingParamsLoader(event),
         message_writer=PipesCloudStorageMessageWriter(
-            client=google.cloud.storage.Client(), execution_id=trace, bucket=event["bucket"]
+            client=google.cloud.storage.Client(),
         ),
     ) as pipes:
         pipes.log.info(f"Cloud function version: {__version__}")
+        pipes.log.info(f"Cloud function trace: {trace}")
         table_location = event["table_location"]
         pipes.log.info(f"Storing data in delta table at {table_location}")
         df = get_fake_data()

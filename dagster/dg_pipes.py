@@ -1,8 +1,12 @@
+import random
+import string
 from contextlib import contextmanager
-from typing import Any, Iterator, Mapping
+from typing import Any, Iterator, Mapping, Optional, Sequence
 
+import google.cloud.storage
 from dagster_pipes import PipesDefaultMessageWriter
 from dg_utils import get_execution_logs, invoke_cloud_function
+from google.api_core.exceptions import NotFound
 
 import dagster._check as check
 from dagster import PipesClient  # type: ignore
@@ -15,10 +19,64 @@ from dagster._core.pipes.client import (
 )
 from dagster._core.pipes.context import PipesMessageHandler
 from dagster._core.pipes.utils import (
+    PipesBlobStoreMessageReader,
     PipesEnvContextInjector,
+    PipesLogReader,
     extract_message_or_forward_to_stdout,
     open_pipes_session,
 )
+
+
+class PipesCloudStorageMessageReader(PipesBlobStoreMessageReader):
+    """Message reader that reads messages by periodically reading message chunks from a specified S3
+    bucket.
+
+    If `log_readers` is passed, this reader will also start the passed readers
+    when the first message is received from the external process.
+
+    Args:
+        interval (float): interval in seconds between attempts to download a chunk
+        bucket (str): The S3 bucket to read from.
+        client (WorkspaceClient): A boto3 client.
+        log_readers (Optional[Sequence[PipesLogReader]]): A set of readers for logs on S3.
+    """
+
+    def __init__(
+        self,
+        *,
+        interval: float = 10,
+        bucket: str,
+        client: google.cloud.storage.Client,
+        log_readers: Optional[Sequence[PipesLogReader]] = None,
+    ):
+        super().__init__(
+            interval=interval,
+            log_readers=log_readers,
+        )
+        self.key_prefix: Optional[str] = None
+        self.bucket = check.str_param(bucket, "bucket")
+        self.client = client
+
+    @contextmanager
+    def get_params(self) -> Iterator[PipesParams]:
+        key_prefix = "".join(random.choices(string.ascii_letters, k=30))  # nosec
+        yield {"bucket": self.bucket, "key_prefix": key_prefix}
+
+    def download_messages_chunk(self, index: int, params: PipesParams) -> Optional[str]:
+        key = f"{params['key_prefix']}/{index}.json"
+        bucket = self.client.bucket(self.bucket)
+        blob = bucket.blob(key)
+        try:
+            return blob.download_as_text()
+        except NotFound:
+            return None
+
+    def no_messages_debug_text(self) -> str:
+        return (
+            f"Attempted to read messages from S3 bucket {self.bucket}. Expected"
+            " PipesS3MessageWriter to be explicitly passed to open_dagster_pipes in the external"
+            " process."
+        )
 
 
 class PipesCloudLoggerMessageReader(PipesMessageReader):
@@ -40,14 +98,10 @@ class PipesCloudLoggerMessageReader(PipesMessageReader):
         finally:
             self._handler = None
 
-    def consume_cloud_function_logs(self, response) -> None:
+    def consume_cloud_function_logs(self, trace_id: str) -> None:
         handler = check.not_none(
             self._handler, "Can only consume logs within context manager scope."
         )
-
-        # Get GCP trace id
-        trace_id = response.headers.get("X-Cloud-Trace-Context")
-        trace_id = trace_id.split(";")[0]
 
         # Get logs
         log_result = get_execution_logs(trace_id)
@@ -73,8 +127,9 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
 
     def __init__(
         self,
+        message_reader: Optional[PipesMessageReader] = None,
     ):
-        self._message_reader = PipesCloudLoggerMessageReader()
+        self._message_reader = message_reader or PipesCloudLoggerMessageReader()
         self._context_injector = PipesCloudFunctionEventContextInjector()
 
     @classmethod
@@ -122,8 +177,13 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
                     f"Failed to invoke cloud function {function_url} with status code {response.status_code}"
                 )
 
+            # Get GCP trace id
+            trace_id = response.headers.get("X-Cloud-Trace-Context") or "abcd1234/0"
+            trace_id = trace_id.split(";")[0]
+
             context.log.info("Cloud function invoked successfully. Waiting for logs...")
-            self._message_reader.consume_cloud_function_logs(response)
+            if isinstance(self._message_reader, PipesCloudLoggerMessageReader):
+                self._message_reader.consume_cloud_function_logs(trace_id)
 
         # should probably have a way to return the lambda result payload
         return PipesClientCompletedInvocation(session)
