@@ -3,7 +3,6 @@ from typing import Any, Iterator, Mapping
 
 from dagster_pipes import PipesDefaultMessageWriter
 from dg_utils import get_execution_logs, invoke_cloud_function
-from httpx import HTTPStatusError
 
 import dagster._check as check
 from dagster import PipesClient  # type: ignore
@@ -119,7 +118,7 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
             context.log.debug(f"Response status code: {response.status_code}")
             if response.status_code != 200:
                 context.log.debug(response.reason)
-                raise HTTPStatusError(
+                raise ValueError(
                     f"Failed to invoke cloud function {function_url} with status code {response.status_code}"
                 )
 
