@@ -2,8 +2,8 @@ from contextlib import contextmanager
 from typing import Any, Iterator, Mapping
 
 from dagster_pipes import PipesDefaultMessageWriter
+from dg_utils import get_execution_logs, invoke_cloud_function
 from httpx import HTTPStatusError
-from utils import get_execution_logs, invoke_cloud_function
 
 import dagster._check as check
 from dagster import PipesClient  # type: ignore
