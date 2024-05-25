@@ -8,7 +8,7 @@ from dagster_pipes import PipesMessage, PipesMessageWriter, PipesMessageWriterCh
 client = google.cloud.logging.Client()
 
 
-class PipesLoggerMessageWriterChannel(PipesMessageWriterChannel):
+class PipesCloudLoggerMessageWriterChannel(PipesMessageWriterChannel):
 
     def __init__(self, trace: str):
         self._trace = trace
@@ -24,12 +24,12 @@ class PipesLoggerMessageWriterChannel(PipesMessageWriterChannel):
         )
 
 
-class PipesLoggerMessageWriter(PipesMessageWriter):
+class PipesCloudLoggerMessageWriter(PipesMessageWriter):
 
     def __init__(self, trace: str) -> None:
         super().__init__()
         self._trace = trace
 
     @contextmanager
-    def open(self, params: PipesParams) -> Iterator[PipesLoggerMessageWriterChannel]:
-        yield PipesLoggerMessageWriterChannel(self._trace)
+    def open(self, params: PipesParams) -> Iterator[PipesCloudLoggerMessageWriterChannel]:
+        yield PipesCloudLoggerMessageWriterChannel(self._trace)
