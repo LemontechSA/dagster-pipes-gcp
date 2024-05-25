@@ -4,6 +4,10 @@
 
 Deploy a simple GCP function and orchestrate it with Dagster.
 
+## Attribution
+
+A large chunk of this code has been modified from the dagster-pipes [AWS Lambda implementation](https://docs.dagster.io/concepts/dagster-pipes/aws-lambda).
+
 ## Devcontainer
 
 This repository contains a devcontainer. I recommend that you use it.
