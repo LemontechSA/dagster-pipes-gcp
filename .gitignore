@@ -113,7 +113,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -149,3 +148,4 @@ cython_debug/
 .develop
 .tmp
 .secrets
+.dagster

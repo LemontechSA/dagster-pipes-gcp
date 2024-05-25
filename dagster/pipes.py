@@ -48,7 +48,11 @@ class PipesFunctionLogsMessageReader(PipesMessageReader):
         )
 
         # Get GCP trace id
-        trace_id = response.headers.get("X-Cloud-Trace-Context").split(";")[0]
+        trace_id = response.headers.get("X-Cloud-Trace-Context")
+        if trace_id is None:
+            trace_id = "troio"
+        else:
+            trace_id = trace_id.split(";")[0]
 
         # Get logs
         log_result = get_execution_logs(trace_id)
@@ -113,6 +117,8 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
                 payload_data: Mapping[str, Any] = event  # type: ignore
 
             context.log.info(payload_data)
+
+            # Todo: check for errors!
             response = invoke_cloud_function(
                 url=function_url,
                 data=payload_data,

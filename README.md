@@ -2,14 +2,18 @@
 
 🚧 Under construction
 
-Simple GCP function to be used with dagster-pipes.
+Deploy a simple GCP function and orchestrate it with Dagster.
+
+## Devcontainer
+
+This repository contains a devcontainer. I recommend that you use it.
 
 ## Setup
 
-Open the project in the devcontainer and run `just setup`/`just s`.
+Add a service account JSON credentials called 'sa.json' file to '.devcontainer/.secrets'. This service account should have permissions to invoke a cloud function & read logs, but to be honest I've used a service account with very broad permissions for now.
 
-Add a .env file with your Azure OpenAI credentials to the '.devcontainer' folder. See '.env.example' for an example.
+In .devcontainer/.env, change the GOOGLE_PROJECT_ID environment variable to your GCP project id.
 
-## Using the CLI
+Open the project in the devcontainer and run `just setup`/`just s`. This will install the dependencies and configure gcloud.
 
-An example is provided in the justfile. Execute `just example`/`just e` to run it.
+## Development
