@@ -75,8 +75,7 @@ class PipesCloudStorageMessageWriterChannel(PipesBlobStoreMessageWriterChannel):
     def upload_messages_chunk(self, payload: IO, index: int) -> None:
         key = f"{self._key_prefix}/{index}.json" if self._key_prefix else f"{index}.json"
         blob = self._bucket.blob(key)
-        body = payload.read()
-        blob.upload_from_string(body)
+        blob.upload_from_string(payload.read())
 
 
 class PipesCloudLoggerMessageWriterChannel(PipesMessageWriterChannel):
