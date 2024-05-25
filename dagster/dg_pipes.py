@@ -21,7 +21,7 @@ from dagster._core.pipes.utils import (
 )
 
 
-class PipesGcpLoggingMessageReader(PipesMessageReader):
+class PipesCloudLoggerMessageReader(PipesMessageReader):
     """Message reader that consumes logs from Google Cloud Logging. This means messages
     emitted during the computation will only be processed once the cloud function completes.
 
@@ -74,7 +74,7 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
     def __init__(
         self,
     ):
-        self._message_reader = PipesGcpLoggingMessageReader()
+        self._message_reader = PipesCloudLoggerMessageReader()
         self._context_injector = PipesCloudFunctionEventContextInjector()
 
     @classmethod
