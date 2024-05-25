@@ -22,13 +22,11 @@ from dagster._core.pipes.utils import (
 )
 
 
-class PipesFunctionLogsMessageReader(PipesMessageReader):
-    """Message reader that consumes buffered pipes messages that were flushed on exit from the
-    final 4k of logs that are returned from issuing a sync lambda invocation. This means messages
-    emitted during the computation will only be processed once the lambda completes.
+class PipesGcpLoggingMessageReader(PipesMessageReader):
+    """Message reader that consumes logs from Google Cloud Logging. This means messages
+    emitted during the computation will only be processed once the cloud function completes.
 
-    Limitations: If the volume of pipes messages exceeds 4k, messages will be lost and it is
-    recommended to switch to PipesS3MessageWriter & PipesS3MessageReader.
+    Adapted from: https://github.com/dagster-io/dagster/blob/master/python_modules/libraries/dagster-aws/dagster_aws/pipes.py
     """
 
     @contextmanager
@@ -59,12 +57,10 @@ class PipesFunctionLogsMessageReader(PipesMessageReader):
             extract_message_or_forward_to_stdout(handler, log_line)
 
     def no_messages_debug_text(self) -> str:
-        return (
-            "Attempted to read messages by extracting them from the tail of lambda logs directly."
-        )
+        return "Attempted to read messages by extracting them from the tail of cloud function logs directly."
 
 
-class PipesFunctionEventContextInjector(PipesEnvContextInjector):
+class PipesCloudFunctionEventContextInjector(PipesEnvContextInjector):
     def no_messages_debug_text(self) -> str:
         return "Attempted to inject context via the cloud function event input."
 
@@ -79,8 +75,8 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
     def __init__(
         self,
     ):
-        self._message_reader = PipesFunctionLogsMessageReader()
-        self._context_injector = PipesFunctionEventContextInjector()
+        self._message_reader = PipesGcpLoggingMessageReader()
+        self._context_injector = PipesCloudFunctionEventContextInjector()
 
     @classmethod
     def _is_dagster_maintained(cls) -> bool:
@@ -93,11 +89,11 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
         event: Mapping[str, Any],
         context: OpExecutionContext,
     ):
-        """Synchronously invoke a lambda function, enriched with the pipes protocol.
+        """Synchronously invoke a cloud function function, enriched with the pipes protocol.
 
         Args:
-            function_name (str): The name of the function to use.
-            event (Mapping[str, Any]): A JSON serializable object to pass as input to the lambda.
+            function_url (str): The HTTP url that triggers the cloud function.
+            event (Mapping[str, Any]): A JSON serializable object to pass as input to the cloud function.
             context (OpExecutionContext): The context of the currently executing Dagster op or asset.
         """
         with open_pipes_session(
@@ -106,7 +102,7 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
             context_injector=self._context_injector,
         ) as session:
 
-            if isinstance(self._context_injector, PipesFunctionEventContextInjector):
+            if isinstance(self._context_injector, PipesCloudFunctionEventContextInjector):
                 payload_data = {
                     **event,
                     **session.get_bootstrap_env_vars(),
