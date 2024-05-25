@@ -3,6 +3,9 @@ name: 'Pipeline (nprod)'
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'dagster/*'
+      - 'cloud_function/*'
 
 permissions:
   contents: read
