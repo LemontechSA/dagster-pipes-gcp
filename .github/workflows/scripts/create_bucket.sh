@@ -4,12 +4,12 @@
 
 set -e
 
-GCP_PROJECT_NAME=$1
+BUCKET_NAME=$1
 
-export BUCKET_EXISTS=$(gcloud storage buckets list --format=json --filter=cloud-functions-source-code | jq length)
+export BUCKET_EXISTS=$(gcloud storage buckets list --format=json --filter=$BUCKET_NAME | jq length)
 
 if [ "$BUCKET_EXISTS" = "0" ]; then
-    gcloud storage buckets create gs://$GCP_PROJECT_NAME-cloud-functions-source-code  \
+    gcloud storage buckets create gs://$BUCKET_NAME  \
         --location EUROPE-WEST4 \
         --uniform-bucket-level-access
 else
