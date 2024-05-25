@@ -50,10 +50,7 @@ class PipesFunctionLogsMessageReader(PipesMessageReader):
 
         # Get GCP trace id
         trace_id = response.headers.get("X-Cloud-Trace-Context")
-        if trace_id is None:
-            trace_id = "troio"
-        else:
-            trace_id = trace_id.split(";")[0]
+        trace_id = trace_id.split(";")[0]
 
         # Get logs
         log_result = get_execution_logs(trace_id)
@@ -117,23 +114,21 @@ class PipesFunctionClient(PipesClient, TreatAsResourceParam):
             else:
                 payload_data: Mapping[str, Any] = event  # type: ignore
 
-            context.log.info(payload_data)
-
             # Todo: check for errors!
             response = invoke_cloud_function(
                 url=function_url,
                 data=payload_data,
             )
 
-            context.log.debug(response.status_code)
+            context.log.debug(f"Response status code: {response.status_code}")
 
             if response.status_code != 200:
-                context.log.debug(response.content.decode("utf-8"))
+                context.log.debug(response.reason)
                 raise HTTPStatusError(
                     f"Failed to invoke cloud function {function_url} with status code {response.status_code}"
                 )
 
-            # self._message_reader.consume_cloud_function_logs(response)
+            self._message_reader.consume_cloud_function_logs(response)
 
         # should probably have a way to return the lambda result payload
         return PipesClientCompletedInvocation(session)
