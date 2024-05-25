@@ -13,7 +13,7 @@ auth:
   gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
 
 serve_cloud_function:
-  poetry run functions-framework --target=main --source=src/main.py --debug
+  poetry run functions-framework --target=main --source=cloud_function/main.py --debug
 
 call:
   curl -m 70 -X POST http://127.0.0.1:8080 \
