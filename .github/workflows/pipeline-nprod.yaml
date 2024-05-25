@@ -7,6 +7,9 @@ on:
 permissions:
   contents: read
 
+env:
+  GCP_PROJECT_ID: jasper-ginn-dagster
+
 jobs:
   checks:
     name: 'checks'
@@ -66,4 +69,4 @@ jobs:
           version: ${{ env.VERSION }}
           environment: nprod
           gcp_credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
-          gcp_project_id: "jasper-ginn-dagster"
+          gcp_project_id: ${{ env.GCP_PROJECT_ID }}

@@ -22,9 +22,7 @@ In GitHub secrets, ensure that you have set the `GOOGLE_CREDENTIALS` secret with
 
 Also, you should change the 'gcp_project_id' input to your own project id in the 'deploy' templates used by '.github/workflows/pipeline-nprod.yaml' and .'github/workflows/pipeline-prod.yaml'.
 
-Your project must enable the following APIs:
-
-- ...
+Go to GitHub and manually trigger the pipeline called 'setup'. This will enable the APIs and create a storage bucket to store the cloud functions code.
 
 CI/CD workflow is as follows:
 
