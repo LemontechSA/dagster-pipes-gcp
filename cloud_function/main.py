@@ -19,7 +19,7 @@ def main(request: flask.Request):
             trace=f"projects/jasper-ginn-dagster/traces/{trace}"
         ),
     ) as pipes:
-        pipes.log.info(f"Version: {__version__}")
+        pipes.log.info(f"Cloud function version: {__version__}")
         table_location = event["table_location"]
         pipes.log.info(f"Storing data in delta table at {table_location}")
         df = get_fake_data()
