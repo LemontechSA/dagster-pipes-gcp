@@ -10,6 +10,9 @@ import tenacity
 from google.auth.transport.requests import AuthorizedSession, Request
 
 
+class NotAllLogsReceivedException(Exception): ...
+
+
 class NoLogsException(Exception): ...
 
 
@@ -64,4 +67,7 @@ def get_execution_logs(trace_id: str):
                 out.append(entry.payload["message"])
     if len(out) == 0:
         raise NoLogsException(f"No logs found for trace id={trace_id}")
-    return out
+    elif json.loads(out[-1])["method"] != "closed":
+        raise NotAllLogsReceivedException(f"Logs not yet complete for trace id={trace_id}")
+    else:
+        return out
