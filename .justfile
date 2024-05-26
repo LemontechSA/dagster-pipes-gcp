@@ -28,7 +28,7 @@ dagster_dev:
   cd dagster && poetry run dagster dev -f DAG.py
 
 install:
-  poetry install --with dev --with local
+  poetry install --with dev --with local --with test
 
 pre_commit_setup:
   poetry run pre-commit install
