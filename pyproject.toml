@@ -28,6 +28,10 @@ dagster = "^1.7.6"
 dagster-webserver = "^1.7.6"
 tenacity = "^8.3.0"
 
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.2.1"
+
 [tool.black]
 line-length = 100
 exclude = '''
