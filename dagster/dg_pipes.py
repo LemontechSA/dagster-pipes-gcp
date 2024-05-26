@@ -6,7 +6,6 @@ from typing import Any, Iterator, Mapping, Optional, Sequence
 import google.cloud.storage
 from dagster_pipes import PipesDefaultMessageWriter
 from dg_utils import get_execution_logs, invoke_cloud_function
-from google.api_core.exceptions import NotFound
 
 import dagster._check as check
 from dagster import PipesClient  # type: ignore
@@ -66,9 +65,9 @@ class PipesCloudStorageMessageReader(PipesBlobStoreMessageReader):
         key = f"{params['key_prefix']}/{index}.json"
         bucket = self.client.bucket(self.bucket)
         blob = bucket.blob(key)
-        try:
+        if blob.exists():
             return blob.download_as_text()
-        except NotFound:
+        else:
             return None
 
     def no_messages_debug_text(self) -> str:
