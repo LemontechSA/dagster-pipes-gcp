@@ -33,7 +33,7 @@ def mock_storage_client(request):
     mock_client = mock.MagicMock()
     mock_bucket = mock.MagicMock()
     mock_blob = mock.MagicMock()
-    # mock_blob.exists.return_value = request.param
+    mock_blob.exists.return_value = request.param
     mock_blob.download_as_text.return_value = "some message"
     mock_client.bucket.return_value = mock_bucket
     mock_client.bucket.return_value.blob.return_value = mock_blob
