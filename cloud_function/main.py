@@ -22,8 +22,10 @@ def main(request: flask.Request):
     ) as pipes:
         pipes.log.info(f"Cloud function version: {__version__}")
         pipes.log.info(f"Cloud function trace: {trace}")
-        table_location = event["table_location"]
-        pipes.log.info(f"Storing data in delta table at {table_location}")
+        dl_bucket = event["dl_bucket"]
+        pipes.log.debug(f"Storing data in bucket {dl_bucket}")
+        table_location = f"{dl_bucket}/{pipes.asset_key}"
+        pipes.log.debug(f"Writing data to {table_location}")
         df = get_fake_data()
         df.write_delta(table_location, mode="append")
         pipes.report_asset_materialization(
