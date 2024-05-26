@@ -163,6 +163,12 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
             else:
                 payload_data: Mapping[str, Any] = event  # type: ignore
 
+            pipes_messages = session.get_bootstrap_params().get("DAGSTER_PIPES_MESSAGES")
+            if "bucket" in pipes_messages.keys() and "key_prefix" in pipes_messages.keys():
+                context.log.debug(
+                    f"Execution logs are stored in gs://{pipes_messages['bucket']}/{pipes_messages['key_prefix']}/"
+                )
+
             response = invoke_cloud_function(
                 url=function_url,
                 data=payload_data,
@@ -170,7 +176,10 @@ class PipesCloudFunctionClient(PipesClient, TreatAsResourceParam):
 
             context.log.debug(f"Response status code: {response.status_code}")
             if response.status_code != 200:
-                context.log.debug(response.reason)
+                context.log.error(
+                    f"Failed to invoke cloud function {function_url}. Returned status code {response.status_code}."
+                )
+                context.log.error(response.text)
                 raise ValueError(
                     f"Failed to invoke cloud function {function_url} with status code {response.status_code}"
                 )
