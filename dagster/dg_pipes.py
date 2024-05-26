@@ -27,7 +27,7 @@ from dagster._core.pipes.utils import (
 
 
 class PipesCloudStorageMessageReader(PipesBlobStoreMessageReader):
-    """Message reader that reads messages by periodically reading message chunks from a specified S3
+    """Message reader that reads messages by periodically reading message chunks from a specified GCS
     bucket.
 
     If `log_readers` is passed, this reader will also start the passed readers
@@ -35,9 +35,9 @@ class PipesCloudStorageMessageReader(PipesBlobStoreMessageReader):
 
     Args:
         interval (float): interval in seconds between attempts to download a chunk
-        bucket (str): The S3 bucket to read from.
-        client (WorkspaceClient): A boto3 client.
-        log_readers (Optional[Sequence[PipesLogReader]]): A set of readers for logs on S3.
+        bucket (str): The GCS bucket to read from.
+        client (google.cloud.storage.Client): A google.cloud.storage client object
+        log_readers (Optional[Sequence[PipesLogReader]]): A set of readers for logs on GCS.
     """
 
     def __init__(
@@ -72,8 +72,8 @@ class PipesCloudStorageMessageReader(PipesBlobStoreMessageReader):
 
     def no_messages_debug_text(self) -> str:
         return (
-            f"Attempted to read messages from S3 bucket {self.bucket}. Expected"
-            " PipesS3MessageWriter to be explicitly passed to open_dagster_pipes in the external"
+            f"Attempted to read messages from GCS bucket {self.bucket}. Expected"
+            " PipesCloudStorageMessageReader to be explicitly passed to open_dagster_pipes in the external"
             " process."
         )
 

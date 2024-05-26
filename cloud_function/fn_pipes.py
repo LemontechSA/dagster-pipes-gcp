@@ -19,10 +19,10 @@ logging_client = google.cloud.logging.Client()
 
 
 class PipesCloudStorageMessageWriter(PipesBlobStoreMessageWriter):
-    """Message writer that writes messages by periodically writing message chunks to an S3 bucket.
+    """Message writer that writes messages by periodically writing message chunks to a GCS bucket.
 
     Args:
-        client (Any): A boto3.client("s3") object.
+        client (google.cloud.storage.Client): A google.cloud.storage client object
         interval (float): interval in seconds between upload chunk uploads
     """
 
@@ -50,11 +50,11 @@ class PipesCloudStorageMessageWriter(PipesBlobStoreMessageWriter):
 
 
 class PipesCloudStorageMessageWriterChannel(PipesBlobStoreMessageWriterChannel):
-    """Message writer channel for writing messages by periodically writing message chunks to an S3 bucket.
+    """Message writer channel for writing messages by periodically writing message chunks to a GCS bucket.
 
     Args:
-        client (Any): A boto3.client("s3") object.
-        bucket (str): The name of the S3 bucket to write to.
+        client (google.cloud.storage.Client): A google.cloud.storage client object
+        bucket (str): The name of the GCS bucket to write to.
         key_prefix (Optional[str]): An optional prefix to use for the keys of written blobs.
         interval (float): interval in seconds between upload chunk uploads
     """
