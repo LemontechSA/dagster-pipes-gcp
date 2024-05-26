@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+# NB: GCP credentials don't work properly on M3
+FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 ENV GIT_PYTHON_REFRESH=quiet
 ENV DEBIAN_FRONTEND=noninteractive

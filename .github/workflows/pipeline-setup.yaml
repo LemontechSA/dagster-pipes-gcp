@@ -34,3 +34,6 @@ jobs:
     - name: 'Create storage bucket for dagster-pipes logs'
       run: ./.github/workflows/scripts/create_bucket.sh ${{ env.GCP_PROJECT_ID }}-dagster-pipes-logs
       shell: bash
+    - name: 'Create storage bucket to store data'
+      run: ./.github/workflows/scripts/create_bucket.sh ${{ env.GCP_PROJECT_ID }}-data-lake
+      shell: bash
