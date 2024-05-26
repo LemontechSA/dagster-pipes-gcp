@@ -1,3 +1,5 @@
+import os
+
 import flask
 import google.cloud.logging
 import google.cloud.storage
@@ -24,7 +26,7 @@ def main(request: flask.Request):
         pipes.log.info(f"Cloud function trace: {trace}")
         dl_bucket = event["dl_bucket"]
         pipes.log.debug(f"Storing data in bucket {dl_bucket}")
-        table_location = f"{dl_bucket}/{pipes.asset_key}"
+        table_location = os.path.join(dl_bucket, pipes.asset_key)
         pipes.log.debug(f"Writing data to {table_location}")
         df = get_fake_data()
         df.write_delta(table_location, mode="append")
